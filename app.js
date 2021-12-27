@@ -7,13 +7,16 @@ const moment = require("moment");
 const {json} = require("body-parser");
 const http = require("http");
 const server = http.createServer(app);
+const env         = require('dotenv').config();
 
 // Required Routes
 const adminRoutes = require('./Route/AdminRoutes');
 const userRoutes = require('./Route/UserRoutes');
+const productRoutes = require("./Route/ProductRoutes");
 
 
-const dbUrl = 'mongodb://localhost:27017/AfcHalalMeat';
+
+const dbUrl =  'mongodb://localhost:27017/AfcHalalMeat';
 
 // Connect Mongo DB
 mongoose.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology:true},
@@ -27,26 +30,24 @@ mongoose.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology:true},
 mongoose.Promise = global.Promise;
 
 
+
 // Middlewares
-app.use(morgan("dev"));
-app.use('/Uploads', express.static('Uploads'));
-app.use('/Assets', express.static('Assets'));
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+
+
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization, Content-Type, Signature"
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
     );
-
+  
     if (req.method === "OPTIONS") {
-        res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-        return res.status(200).json({});
+      res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+      return res.status(200).json({});
     }
     next();
-});
-
+  });
+  
 //
 // app.set('view engine','ejs');
 // app.use(express.static('public'));
@@ -57,10 +58,17 @@ app.use((req, res, next) => {
 
 
 // Routes which should handle requests
+app.use(morgan("dev"));
+app.use('/Uploads', express.static('Uploads'));
+app.use('/Assets', express.static('Assets'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 
 
 app.use("/admin", adminRoutes);
 app.use("/user",userRoutes);
+app.use("/product",productRoutes);
 
 
 

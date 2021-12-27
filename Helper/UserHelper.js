@@ -1,6 +1,8 @@
 const moment = require("moment");
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const env  = require('dotenv').config();
 // Mongoose
 const mongoose = require("mongoose");
 
@@ -62,14 +64,33 @@ exports.createUser = async (email, password,role = 'user') => {
     await user.save();
 }
 
-exports.createAdmin = async (email, password,role = 'admin') => {
+
+exports.tokenCreater = async (email) => {
+    return jwt.sign({
+        iss: 'Afc',
+        sub: email,
+        iat: new Date().getTime(), // current time
+        exp: Math.floor(Date.now() / 1000) + (60 * 60)// 60 minutes
+    }, process.env.JWT_SECRET);
+}
+
+
+exports.decodeToken = async (token) => {
+    try {
+        return jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        return err;
+    }
+}
+
+exports.createAdmin = async (email, password,role = 'admin',token) => {
     const user = new User({
         _id: new mongoose.Types.ObjectId(),
         email: email,
         password: password,
         profileImage: "default.jpg",
-        backgroundImage: "default.jpg",
-        role: role
+        role: role,
+        token:token
     });
     await user.save();
 }

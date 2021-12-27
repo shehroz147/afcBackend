@@ -9,6 +9,7 @@ const userSchema = mongoose.Schema({
     password: {type: String, required: true},
     role: {type: String, default: 'user'},
     profileImage: {type: String, default: "default.jpg"},
+    token :{type:String},
     isDeleted: {type: Boolean, default: false},
     deletedAt: {type: Date, default: null},
 }, {timestamps: true});

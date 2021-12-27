@@ -6,15 +6,15 @@ const mongoose = require("mongoose");
 const Product = require("../Model/Product");
 
 
-exports.addProduct = async(_name,_category,_price,image)=>{
+exports.addProduct = async(name,category,price,picture)=>{
     const product = new Product({
         _id : new mongoose.Types.ObjectId(),
-        name: _name,
-        price: _price,
-        category: _category,
-        productImage:image
+        name: name,
+        price: price,
+        category: category,
+        productImage:picture
     });
-    return await product.save();
+    await product.save();
 }
 
 exports.updatingProduct = async (product_, request, res) => {
@@ -43,12 +43,6 @@ exports.updatingProduct = async (product_, request, res) => {
 
 exports.getProducts = async()=>{
     let products = [];
-        products = await Product.find({ isDeleted: false}, {
-            name: 1,
-            category: 1,
-            price: 1,
-            productImage: 1,
-            _id: 0
-        });
+        products = await Product.find({ isDeleted: false});
         return products;
 }

@@ -4,10 +4,11 @@ const router = express.Router();
 
 // Controllers
 const UserController = require("../Controller/UserController");
+const AdminController = require("../Controller/AdminController");
 
 
 // Routes
-router.post("/login",UserController.login);
+router.post("/login",AdminController.login);
 router.post("/signup",UserController.signup);
 router.post("/showProducts",UserController.getProducts);
 
