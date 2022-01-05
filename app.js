@@ -20,7 +20,7 @@ const dbUrl =  'mongodb://localhost:27017/AfcHalalMeat';
 
 
 // Connect Mongo DB
-mongoose.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology:true,useFindAndModify:true},
+mongoose.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology:true},
 (err) => {
     if (!err) {
         console.log('Connection Successful');
