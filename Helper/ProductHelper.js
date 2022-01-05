@@ -1,34 +1,36 @@
 const moment = require("moment");
-const express = require("express");
-const bcrypt = require("bcryptjs");
 // Mongoose
-const mongoose = require("mongoose");
 const Product = require("../Model/Product");
-
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const express = require("express");
+const bodyParser = require("body-parser");
+const env         = require('dotenv').config();
 
 exports.addProduct = async(name,category,price,picture)=>{
     const product = new Product({
         _id : new mongoose.Types.ObjectId(),
-        name: name,
+        title: name,
         price: price,
         category: category,
-        productImage:picture
+        imageUrl:picture
     });
-    await product.save();
+    result = await product.save();
+    return result;
 }
 
-exports.updatingProduct = async (product_, request, res) => {
-
+exports.updatingProduct = async (product_, req, res) => {
     let result = "";
 
     const updateProduct = {
-        name: request.name || product_.fullName,
-        category: request.category || product_.category,
-        image: request.image || product_.image,
-        price: request.price || product_.price,
+        title: req.body.title || product_.title,
+        category: req.body.category || product_.category,
+        image: req.body.Url || product_.imageUrl,
+        price: req.body.price || product_.price,
         };
 
-    await Product.updateOne({ _id: request._id }, { $set: updateProduct })
+    await Product.updateOne({ _id: product_._id }, { $set: updateProduct })
         .exec()
         .then(docs => {
             result = docs;
@@ -41,8 +43,35 @@ exports.updatingProduct = async (product_, request, res) => {
     return result;
 }
 
-exports.getProducts = async()=>{
-    let products = [];
+exports.getProducts = async(req,res)=>{
+        let products=[];
         products = await Product.find({ isDeleted: false});
+        // console.log(products);
         return products;
+}
+
+exports.findProduct = async(product)=>{
+   let data = [];
+   data = await Product.findOne({_id:product},{
+            title:1,
+            category:1,
+            imageUrl:1,
+            price:1
+
+   });
+   return data;
+}
+
+exports.getProductName = async(_id)=>{
+    let product="";
+    product = await db.collection('user').find({_id:_id});
+    return product.title;
+}
+
+exports.deleteProduct = async (id) => {
+    let updateInfo = {
+        isDeleted: true,
+        deletedAt: moment()
+    }
+    await Product.updateOne({ _id: id }, { $set: updateInfo }).exec();
 }

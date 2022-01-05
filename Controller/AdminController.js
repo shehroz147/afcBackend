@@ -15,6 +15,7 @@ const Product = require("../Model/Product");
 const UserHelper = require("../Helper/UserHelper");
 const ProductHelper = require("../Helper/ProductHelper");
 const ResponseHelper = require("../Helper/ResponseHelper");
+const { token } = require("morgan");
 
 
 // exports.login = async (req, res, next) => {
@@ -73,46 +74,45 @@ exports.signup = async (req, res, next) => {
 
 exports.addProduct = async (req,res)=>{
     let request = req.body;
-    const name = request.name;
+    const title = request.title;
     const category = request.category;
     const price = request.price;
-    const picture =request.picture;
-    console.log(name," ",category," ",price," ",picture);
-    if(!name || !category || !price || !picture ){
+    const imageUrl =request.imageUrl;
+    // console.log(name," ",category," ",price," ",picture);
+    if(!title || !category || !price || !imageUrl ){
             return res.status(400).json("Missing credentials");
     }
-       let result = await ProductHelper.addProduct(name,category,price,picture);
-        return res.status(200).json("Product successfully added");
+       let result = await ProductHelper.addProduct(title,category,price,imageUrl);
+        return res.status(200).json(result);
 };
 
 exports.editProduct = async (req, res, next) =>{
-
-
-    let request = req.body;
-    if (!request._id){
-        return res.status(400).json("Missing Product Id");
+    let request = req.params;
+    const id = request.id;
+    if(!request.id){
+        return res.status(400).json("Missing Product Id")
     }
-    let findProduct = await Product.findById({_id:request._id});
-    if (findProduct === null) {
-        return res.status(400).json("Missing Product");
+    let product = await ProductHelper.findProduct(id);
+    if(!product){
+        return res.status(400).json("No such product");
     }
-    let result = await ProductHelper.updatingProduct(findProduct, request, res);
+    let result = await ProductHelper.updatingProduct(product, req, res);
     return res.status(200).json("Product Updated");
 };
 
-exports.deleteProducts = async (req, res, next) => {
-    let request = req.body;
-    let result="";
-    const productId = request._id;
-    await Product.deleteOne({_id:productId}).exec().then(docs => {
-        result = docs;
-    })
-.catch(err => {
-        res.status(500).json({
-            error: err
-        });
-    });
-    return res.status(200).json("Product Deleted");
+exports.deleteProduct = async (req, res, next) => {
+    let request = req.params;
+    const id = request.id;
+    if(!request.id){
+        return res.status(400).json("Missing Product Id")
+    }
+    let result = await ProductHelper.findProduct(id);
+    if(!result){
+        return res.status(400).json("No such product");
+    }
+    let deleteProduct = await ProductHelper.deleteProduct(id);
+    return res.status(200).json("Product deleted successfully");
+    
 };
 // export const deleteProduct = async (req, res, next) => {
 //     try {
@@ -214,14 +214,14 @@ exports.login = async (req, res, next) => {
     {
         return res.status(400).json("Missing Email or Password")
     }
-    let user = await UserHelper.foundUserByEmail(request.email);
-    if(user==null) 
+    let _user = await UserHelper.foundUserByEmail(request.email);
+    if(_user==null) 
     {
         return res.status(400).json("User does not exist")
     }
 
     // let name = await UserHelper.getUserName(user);
-    bcrypt.compare(req.body.password, user.password, (err, result) => {
+    bcrypt.compare(req.body.password, _user.password, (err, result) => {
         if (err) 
         {
             return res.status(400).json("Wrong Password")
@@ -230,9 +230,9 @@ exports.login = async (req, res, next) => {
         {
 
             let data = {
-                email   : user.email,
-                userId  : user._id,
-                role    : user.role,
+                email   : _user.email,
+                userId  : _user._id,
+                role    : _user.role,
             };
             
             // Object.assign(user, {name:name});
@@ -243,32 +243,42 @@ exports.login = async (req, res, next) => {
 
             const token = jwt.sign(data, process.env.JWT_SECRET, optional);
             
-            Object.assign(user);
+            // Object.assign(user,{_id:user._id});
             
-            let result = {
-                _id     : user._id,
-                role    : user.role,
-                email   : user.email,
-                profileImage : user.profileImage,
+            let user = {
+                _id     : _user._id,
+                role    : _user.role,
+                email   : _user.email,
+                profileImage : _user.profileImage,
             }
-            let response = ResponseHelper.setResponse(200,"Success",result);
-            response.token = token; 
-            response.currentUser = user._id;
+            let response = ResponseHelper.setResponse(200,"Success",user);
+            response.token = token;
+            response.currentUser = _user._id;
             return res.status(200).json(response);
         }
-        return res.status(400).json("Invalid Password")
     });
 };
 
 exports.getProducts = async(req,res)=>{
     let request = req.body;
-    let findProducts = await ProductHelper.getProducts();
-    if(findProducts==null){
+    let products = await ProductHelper.getProducts();
+    if(products==null){
         return res.status(400).json("No Products");
     }
-    return res.status(200).json(findProducts);
+    let response = ResponseHelper.setResponse(200,"Success",products)
+    return res.status(200).json(response);
 };
 
-exports.getAdmin = async(req,res)=>{
-    let request = req.body;
+exports.getSpecificProduct = async(req,res,next)=>{
+    let request = req.params;
+    if(!request.id){
+        return res.status(400).json("Missing Product Id")
+    }
+    const id = req.params.id;
+    console.log(id);
+    let result = await ProductHelper.findProduct(id);
+    if(!result){
+        return res.status(400).json("No such product");
+    }
+    return res.status(200).json(result);
 }

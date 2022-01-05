@@ -1,6 +1,13 @@
 const Product = require("../Model/Product");
 const ProductHelper = require("../Helper/ProductHelper");
 const User = require("../Model/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const express = require("express");
+const bodyParser = require("body-parser");
+const env         = require('dotenv').config();
+const ResponseHelper = require("../Helper/ResponseHelper");
 // import Cart, { addToCart } from "../Models/cart.js";
 // import paypal from "paypal-rest-sdk";
 // import {
@@ -201,15 +208,25 @@ const User = require("../Model/User");
 // };
 
 exports.addProduct = async (req,res,next)=>{
-    let request = req.body;
-    const name = request.name;
-    const category = request.category;
-    const price = request.price;
-    const picture = request.picture;
-    console.log(name," ",category," ",price," ",picture);
-    if((!request.name || !request.category) || (!request.price || !request.picture) ){
-            return res.status(400).json("Missing credentials");
-    }
-       let result = await ProductHelper.addProduct(name,category,price,picture);
+    let request = req.query;
+    let title = request.title;
+    let category = request.category;
+    let price = request.price;
+    let imageUrl = request.imageUrl;
+//     console.log(name," ",category," ",price," ",picture);
+    // if(!((request.title && request.category) && (request.price && request.imageUrl))){
+    //         return res.status(400).json("Missing credentials");
+    // }
+       let result = await ProductHelper.addProduct(title,category,price,imageUrl);
         return res.status(200).json(result);
+};
+
+exports.getProducts = async(req,res)=>{
+    let request = req.body;
+    let products = await ProductHelper.getProducts();
+    if(products==null){
+        return res.status(400).json("No Products");
+    }
+    let response = ResponseHelper.setResponse(200,"Success",products)
+    return res.status(200).json(response);
 };

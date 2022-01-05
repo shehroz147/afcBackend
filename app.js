@@ -18,8 +18,9 @@ const productRoutes = require("./Route/ProductRoutes");
 
 const dbUrl =  'mongodb://localhost:27017/AfcHalalMeat';
 
+
 // Connect Mongo DB
-mongoose.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology:true},
+mongoose.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology:true,useFindAndModify:true},
 (err) => {
     if (!err) {
         console.log('Connection Successful');
@@ -48,6 +49,8 @@ app.use((req, res, next) => {
     next();
   });
   
+// app.use(app.router);
+// app.use(express.static(__dirname + '/static'));
 //
 // app.set('view engine','ejs');
 // app.use(express.static('public'));
@@ -69,7 +72,7 @@ app.use(bodyParser.json());
 app.use("/admin", adminRoutes);
 app.use("/user",userRoutes);
 app.use("/product",productRoutes);
-
+app.use("",productRoutes);
 
 
 // Default Route When nothing matches

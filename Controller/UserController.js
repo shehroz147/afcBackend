@@ -56,7 +56,7 @@ exports.signup = async (req, res, next) => {
     //Signup function to add a new user  when the user provides required info
     let request = req.body;
     //checking required info
-    if (!request.email || !request.password) {
+    if (!req.body.email || !req.body.password) {
         return res.status(400).json("Missing Email or Password");
     }
     //checking if the email entered by user already exists or not

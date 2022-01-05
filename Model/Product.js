@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    name: {type: String},
+    title: {type: String},
     category: {type: String},
-    productImage: {type: String, default: "default.jpg"},
+    imageUrl: {type: String},
     price:{type:Number},
     isDeleted: {type: Boolean, default: false},
     deletedAt: {type: Date, default: null},
