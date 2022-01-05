@@ -72,7 +72,7 @@ app.use(bodyParser.json());
 app.use("/admin", adminRoutes);
 app.use("/user",userRoutes);
 app.use("/product",productRoutes);
-app.use("",productRoutes);
+// app.use("",productRoutes);
 
 
 // Default Route When nothing matches
