@@ -14,7 +14,7 @@ const Product = require("../Model/Product");
 // Helpers
 const UserHelper = require("../Helper/UserHelper");
 const ProductHelper = require("../Helper/ProductHelper");
-
+const ResponseHelper = require("../Helper/ResponseHelper");
 exports.login = async (req, res, next) => {
     let request = req.body;
     if (!(request.email && request.password)) {
@@ -61,25 +61,53 @@ exports.signup = async (req, res, next) => {
     }
     //checking if the email entered by user already exists or not
     let modelUser = await UserHelper.foundUserByEmail(request.email.toLowerCase());
-    if (!(modelUser == null)) {
+    if (!(modelUser === null)) {
         return res.status(400).json("User already exist with this email");
     }
     let password = await UserHelper.bcryptPassword(request.password);
     //adding user to database
     let user = await UserHelper.createUser(request.email.toLowerCase(), password,'user');
-    return res.status(200).json("User successfully created");
+    return res.status(200).json(user);
 };
-
 exports.getProducts = async(req,res)=>{
     let request = req.body;
-    let findProducts = await ProductHelper.getProducts();
-    if(findProducts==null){
-        return res.status(400).json("No Products");
+    const cat = request.name;
+    let findProducts = await ProductHelper.getProducts(cat);
+    console.log(findProducts);
+
+    if(findProducts.length === 0){
+        return res.status(400).json("No Products of this category");
     }
+    
     return res.status(200).json(findProducts);
 }
 
-// exports.addProductToCart = async (req, res, next) => {
+exports.getProduct = async(req,res)=>{
+    let request = req.body;
+    // const cat = request.name;
+    let findProducts = await ProductHelper.getProducts();
+    console.log(findProducts);
+    if(findProducts.length === 0){
+        return res.status(400).json("No Products of this category");
+    }
+    let response = ResponseHelper.setResponse(200,"Success",findProducts)
+    return res.status(200).json(response.result);
+}
+
+
+exports.getProductsByCategory = async(req,res)=>{
+    let request = req.body;
+    const filter = request.name;
+    let findProducts = await ProductHelper.getProductsCategory(filter);
+    // console.log(findProducts);
+    if(findProducts.length === 0){
+        return res.status(400).json("No Products of this category");
+    }
+    let response = ResponseHelper.setResponse(200,"Success",findProducts)
+    return res.status(200).json(response.result);
+}
+
+// exports.addProductToCart =async (req, res, next) => {
 //     let request = req.body;
 //     const product = await Product.find(request.name);
 //

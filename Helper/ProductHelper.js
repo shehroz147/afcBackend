@@ -43,12 +43,18 @@ exports.updatingProduct = async (product_, req, res) => {
     return result;
 }
 
-exports.getProducts = async(req,res)=>{
-        let products=[];
-        products = await Product.find({ isDeleted: false});
-        // console.log(products);
-        return products;
-}
+exports.getProducts = async()=>{
+        let result =[];
+       result =  await Product.find();
+            return result;
+    }
+
+    exports.getProductsCategory = async(filter)=>{
+        let result =[];
+       result =  await Product.find({category:filter});
+            return result;
+    }
+
 
 exports.findProduct = async(product)=>{
    let data = [];
@@ -69,9 +75,9 @@ exports.getProductName = async(_id)=>{
 }
 
 exports.deleteProduct = async (id) => {
-    let updateInfo = {
-        isDeleted: true,
-        deletedAt: moment()
-    }
-    await Product.updateOne({ _id: id }, { $set: updateInfo }).exec();
+    // let updateInfo = {
+    //     isDeleted: true,
+    //     deletedAt: moment()
+    // }
+    await Product.deleteOne({ _id: id }).exec();
 }

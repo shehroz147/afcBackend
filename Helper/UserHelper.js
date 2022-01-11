@@ -58,14 +58,13 @@ exports.createUser = async (email, password,role = 'user') => {
         email: email,
         password: password,
         profileImage: "default.jpg",
-        backgroundImage: "default.jpg",
         role: role
     });
     await user.save();
 }
 
 
-exports.tokenCreater = async (email) => {
+exports.tokenCreated = async (email) => {
     return jwt.sign({
         iss: 'Afc',
         sub: email,

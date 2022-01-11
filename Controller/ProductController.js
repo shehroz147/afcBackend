@@ -223,7 +223,8 @@ exports.addProduct = async (req,res,next)=>{
 
 exports.getProducts = async(req,res)=>{
     let request = req.body;
-    let products = await ProductHelper.getProducts();
+    const name = request.name;
+    let products = await ProductHelper.getProduct();
     if(products==null){
         return res.status(400).json("No Products");
     }

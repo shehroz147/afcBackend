@@ -50,7 +50,7 @@ app.use((req, res, next) => {
   });
   
 // app.use(app.router);
-// app.use(express.static(__dirname + '/static'));
+app.use(express.static(__dirname + '/static'));
 //
 // app.set('view engine','ejs');
 // app.use(express.static('public'));
@@ -72,7 +72,7 @@ app.use(bodyParser.json());
 app.use("/admin", adminRoutes);
 app.use("/user",userRoutes);
 app.use("/product",productRoutes);
-// app.use("",productRoutes);
+app.use("/shop",productRoutes);
 
 
 // Default Route When nothing matches

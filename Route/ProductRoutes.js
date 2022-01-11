@@ -11,7 +11,7 @@ const ProductController = require('../Controller/ProductController');
 
 router.post("/addProduct",ProductController.addProduct);
 router.get("/productList",ProductController.getProducts);
-router.get("/shop/getProducts",ProductController.getProducts);
+router.get("/getProducts",ProductController.getProducts);
 
-
+0
 module.exports = router;
