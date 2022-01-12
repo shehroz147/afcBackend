@@ -12,6 +12,7 @@ const Product = require("../Model/Product");
 // Constants
 
 // Helpers
+const EmailHelper = require("../Helper/EmailHelper");
 const UserHelper = require("../Helper/UserHelper");
 const ProductHelper = require("../Helper/ProductHelper");
 const ResponseHelper = require("../Helper/ResponseHelper");
@@ -67,6 +68,7 @@ exports.signup = async (req, res, next) => {
     let password = await UserHelper.bcryptPassword(request.password);
     //adding user to database
     let user = await UserHelper.createUser(request.email.toLowerCase(), password,'user');
+    let email = await EmailHelper.sendSignUpEmail(request.email);
     return res.status(200).json(user);
 };
 exports.getProducts = async(req,res)=>{
@@ -171,3 +173,26 @@ exports.getProductsByCategory = async(req,res)=>{
 //     }
 // };
 
+exports.forgot = async (req, res, next) => {
+    const request = req.body;
+    const foundUser = await UserHelper.foundUserByEmail(request.email);
+    if (foundUser == null) {
+        let response = ResponseHelper.setResponse(ResponseCode.NOT_SUCCESS, Message.EMAIL_NOT_EXIST);
+        return res.status(response.code).json(response);
+    }
+    const forgotToken = await UserHelper.tokenCreated(request.email);
+    const FRONT_APP_URL = UserHelper.getFrontAppResetUrl();
+    const link = `${FRONT_APP_URL}?userId=${foundUser._id}&token=${forgotToken}`;
+    const BACK_APP_URL = UserHelper.getBackAppUrl();
+    console.log(BACK_APP_URL);
+    await UserHelper.updateUser({email: request.email}, {resetPasswordToken: forgotToken});
+    const replacements = {
+        link: `${FRONT_APP_URL}?userId=${foundUser._id}&token=${forgotToken}`,
+        appName: process.env.APP_NAME,
+        mailFrom: process.env.MAIL_FROM,
+        assetsPath: `${BACK_APP_URL}/Assets`
+    };
+    await EmailHelper.sendForgotPasswordEmail(request.email, replacements);
+    let response = ResponseHelper.setResponse(200, "email sent");
+    return res.status(response.code).json(response);
+};

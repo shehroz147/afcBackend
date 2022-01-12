@@ -218,3 +218,11 @@ exports.addFriend = async (user, friend, res) => {
 exports.findFriend = async (userName, user) => {
     return await User.findOne({ _id: user._id }, { friends: { $elemMatch: { userName: userName } } });
 };
+
+exports.getFrontAppResetUrl=async() => {
+    return process.env.MODE === "DEV" ? process.env.FRONT_APP_RESET_PASSWORD_URL_DEV : process.env.FRONT_APP_RESET_PASSWORD_URL_PRO;
+}
+
+exports.getBackAppUrl = async()=> {
+    return process.env.MODE === "DEV" ? process.env.BACK_APP_URL_DEV : process.env.BACK_APP_URL_PRO;
+}
