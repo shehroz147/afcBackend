@@ -218,7 +218,7 @@ exports.addProduct = async (req,res,next)=>{
     //         return res.status(400).json("Missing credentials");
     // }
        let result = await ProductHelper.addProduct(title,category,price,imageUrl);
-        return res.status(200).json(result);
+        return res.status(200).json("Product has been successfully added");
 };
 
 exports.getProducts = async(req,res)=>{
